@@ -52,7 +52,7 @@ svg{display:block}
 #msg{padding:32px 20px;color:var(--mute);text-align:center}
 .kb{padding:40px 20px;display:flex;flex-direction:column;gap:12px}
 .kb input{height:44px;padding:0 14px;background:var(--chip);border:0;border-radius:10px;color:var(--ink);font-size:16px}
-.pill{background:var(--ink);color:#0f0f0f;border-radius:20px;padding:0 16px;height:36px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
+.pill{background:var(--ink);color:#0f0f0f;border-radius:20px;padding:0 16px;height:36px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;flex:none}
 .pill.dk{background:var(--chip);color:var(--ink)}
 .pill.ol{background:none;color:var(--ink);border:1px solid #444}
 .pill.big{height:48px;font-size:15px;width:100%}
@@ -82,6 +82,11 @@ svg{display:block}
 .cr{display:flex;align-items:center;gap:8px;padding:12px;overflow-x:auto;scrollbar-width:none}
 .cr .av{width:48px;height:48px;font-size:18px}
 .cr .sp{flex:1}
+.cr{gap:4px}
+.cr .ic{width:36px;flex:none}
+.cr .pill{padding:0 13px}
+.pw.fs{position:fixed;z-index:60;margin:0;aspect-ratio:auto;top:0;left:0;width:100vw;height:100dvh}
+@media (orientation:portrait){.pw.fs{width:100dvh;height:100vw;transform-origin:top left;transform:translateX(100vw) rotate(90deg)}}
 .cr .act.on{color:var(--blue)}
 .cr .dis svg{transform:rotate(180deg)}
 .cmt{margin:4px 12px 16px;background:var(--card);border-radius:14px;padding:12px;display:block;width:calc(100% - 24px);text-align:left}
@@ -324,8 +329,14 @@ $("wmu").onclick=function(){if(!P||!P.isMuted)return;P.isMuted()?P.unMute():P.mu
 $("wsk").oninput=function(){seeking=true;clearTimeout(hideT);$("wtm").textContent=fmt(+this.value)+" / "+fmt(P&&P.getDuration?P.getDuration():0)};
 $("wsk").onchange=function(){if(P&&P.seekTo)P.seekTo(+this.value,true);seeking=false;showCtl()};
 $("wcc").onclick=ccSheet;
-$("wfs").onclick=function(){var f=pw.requestFullscreen||pw.webkitRequestFullscreen;if(document.fullscreenElement||document.webkitFullscreenElement){(document.exitFullscreen||document.webkitExitFullscreen).call(document)}else if(f){f.call(pw)}else toast("Trình duyệt này không hỗ trợ toàn màn hình")};
-$("wbk").onclick=function(){if(P&&P.pauseVideo)P.pauseVideo();$("watch").classList.remove("on")};
+$("wfs").onclick=function(){
+ if(pw.classList.contains("fs")){pw.classList.remove("fs");showCtl();return}
+ if(document.fullscreenElement||document.webkitFullscreenElement){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
+ var f=pw.requestFullscreen||pw.webkitRequestFullscreen;
+ if(f){try{var r=f.call(pw);if(r&&r.catch)r.catch(function(){pw.classList.add("fs")});return}catch(e){}}
+ pw.classList.add("fs");showCtl();
+};
+$("wbk").onclick=function(){if(pw.classList.contains("fs")){pw.classList.remove("fs");showCtl();return}if(P&&P.pauseVideo)P.pauseVideo();$("watch").classList.remove("on")};
 $("wgr").onclick=settings;
 function openWatch(id){
  curId=id;curT="";$("srch").classList.remove("on");$("watch").classList.add("on");
