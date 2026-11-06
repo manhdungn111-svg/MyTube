@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<title>MyTube</title>
+<style>
+:root{--bg:#0f0f0f;--ink:#f1f1f1;--mute:#aaa;--chip:#272727;--card:#1f1f1f;--line:#303030;--red:#f00;--blue:#3ea6ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:#000;color:var(--ink);font:14px/1.4 Roboto,"Segoe UI",system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+input{font:inherit}
+svg{display:block}
+#app{position:relative;width:100%;max-width:480px;height:100dvh;margin:0 auto;background:var(--bg);overflow:hidden}
+#main{position:absolute;inset:0 0 64px 0;overflow-y:auto;scrollbar-width:none}
+#main::-webkit-scrollbar{display:none}
+#nav{position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;justify-content:space-around;align-items:center;background:var(--bg);border-top:1px solid #1a1a1a;z-index:10;padding-bottom:env(safe-area-inset-bottom,0)}
+#nav button{width:64px;height:48px;display:grid;place-items:center;opacity:.9}
+#nav button.on{opacity:1}
+#nav .pl{width:36px;height:36px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;height:56px}
+.logo{display:flex;align-items:center;gap:4px;font-weight:700;font-size:21px;letter-spacing:-1px}
+.logo i{width:30px;height:21px;background:var(--red);border-radius:6px;position:relative}
+.logo i:after{content:"";position:absolute;left:12px;top:5px;border-left:8px solid #fff;border-top:5.5px solid transparent;border-bottom:5.5px solid transparent}
+.rt{display:flex;gap:4px}
+.ic{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;position:relative}
+.ic:active{background:var(--chip)}
+.ic em{position:absolute;top:2px;right:0;background:var(--red);color:#fff;font:700 11px/1 Roboto,sans-serif;padding:3px 5px;border-radius:9px}
+.tabs{display:flex;gap:26px;overflow-x:auto;padding:0 16px;scrollbar-width:none;position:sticky;top:0;background:var(--bg);z-index:3}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;padding:10px 0 12px;font-size:16px;font-weight:500;color:var(--mute);border-bottom:3px solid transparent}
+.tabs button.on{color:var(--ink);border-color:var(--red)}
+.card{display:block;width:100%;text-align:left;margin-bottom:20px}
+.tw{position:relative}
+.th{width:100%;aspect-ratio:16/9;object-fit:cover;background:#222;display:block}
+.dur{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.8);padding:1px 5px;border-radius:5px;font-size:12px;font-weight:500}
+.mt{display:flex;gap:12px;padding:12px 12px 0}
+.av{flex:none;width:36px;height:36px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font-weight:600;color:#fff;background:#555}
+.tx{flex:1;min-width:0}
+.tx b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:16px;font-weight:500;line-height:22px}
+.tx small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.mo{color:var(--ink);padding:0 4px}
+.sk{aspect-ratio:16/9;background:#1c1c1c;margin-bottom:60px}
+#msg{padding:32px 20px;color:var(--mute);text-align:center}
+.kb{padding:40px 20px;display:flex;flex-direction:column;gap:12px}
+.kb input{height:44px;padding:0 14px;background:var(--chip);border:0;border-radius:10px;color:var(--ink);font-size:16px}
+.pill{background:var(--ink);color:#0f0f0f;border-radius:20px;padding:0 16px;height:36px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
+.pill.dk{background:var(--chip);color:var(--ink)}
+.pill.ol{background:none;color:var(--ink);border:1px solid #444}
+.pill.big{height:48px;font-size:15px;width:100%}
+/* watch */
+#watch{position:absolute;inset:0;z-index:20;background:var(--bg);display:none;flex-direction:column}
+#watch.on{display:flex}
+.pw{position:relative;aspect-ratio:16/9;background:#000;flex:none;margin-top:env(safe-area-inset-top,0)}
+.pw iframe,.pw>div{width:100%;height:100%}
+.pw .bk,.pw .gr{position:absolute;top:4px;z-index:2;background:rgba(0,0,0,.35);border-radius:50%;width:36px;height:36px;display:grid;place-items:center}
+.pw .bk{left:6px}.pw .gr{right:6px}
+#wb{flex:1;overflow-y:auto;scrollbar-width:none}
+.wt{padding:12px 12px 4px}
+.wt h1{font-size:20px;line-height:26px;margin:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wt h1.x{white-space:normal}
+.wm{color:var(--mute);font-size:13px;margin-top:4px;display:flex;gap:8px;white-space:nowrap;overflow:hidden}
+.wm b{color:var(--ink);font-weight:500}
+.wd{white-space:pre-wrap;word-break:break-word;margin-top:10px;color:var(--ink);font-size:14px}
+.cr{display:flex;align-items:center;gap:8px;padding:12px;overflow-x:auto;scrollbar-width:none}
+.cr .av{width:48px;height:48px;font-size:18px}
+.cr .sp{flex:1}
+.cr .act.on{color:var(--blue)}
+.cr .dis svg{transform:rotate(180deg)}
+.cmt{margin:4px 12px 16px;background:var(--card);border-radius:14px;padding:12px;display:block;width:calc(100% - 24px);text-align:left}
+.cmt h3{margin:0 0 10px;font-size:16px;font-weight:500}
+.cmt h3 span{color:var(--mute);font-size:14px;margin-left:6px}
+.cmt .r{display:flex;gap:12px;align-items:center}
+.cmt .av{width:28px;height:28px;font-size:12px}
+.cmt .p{flex:1;min-width:0;background:#303030;border-radius:20px;padding:8px 14px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* sheet */
+#sheet{position:absolute;inset:0;z-index:40;background:rgba(0,0,0,.55);display:none;align-items:flex-end}
+#sheet.on{display:flex}
+.sh{width:100%;max-height:75%;overflow-y:auto;background:#212121;border-radius:16px 16px 0 0;padding:6px 0 calc(16px + env(safe-area-inset-bottom,0))}
+.sh:before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:#666;margin:6px auto 10px}
+.sh h4{margin:0;padding:8px 20px 12px;font-size:16px;font-weight:500;border-bottom:1px solid #444}
+.row{display:flex;align-items:center;gap:20px;width:100%;padding:0 20px;height:62px;text-align:left;font-size:17px}
+.row .v{margin-left:auto;color:var(--mute);font-size:15px;display:flex;align-items:center;gap:4px}
+.row .ck{width:28px;flex:none}
+.cm{display:flex;gap:12px;padding:10px 16px}
+.cm .av{width:32px;height:32px;font-size:13px}
+.cm small{color:var(--mute)}
+.cm p{margin:2px 0 0;word-break:break-word}
+/* search */
+#srch{position:absolute;inset:0;z-index:30;background:var(--bg);display:none;flex-direction:column}
+#srch.on{display:flex}
+#srch form{display:flex;align-items:center;gap:4px;padding:8px 8px 8px 4px;padding-top:calc(8px + env(safe-area-inset-top,0))}
+#srch input{flex:1;min-width:0;height:40px;border-radius:20px;border:0;background:var(--chip);color:var(--ink);padding:0 16px;font-size:16px}
+#sr{flex:1;overflow-y:auto;padding-top:8px}
+/* shorts */
+#shs{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;background:#000}
+#shs::-webkit-scrollbar{display:none}
+.s{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;background:#000}
+.s .bg,.s .fr,.s .fr iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.s .bg{object-fit:cover}
+.s .acts{position:absolute;right:6px;bottom:100px;display:flex;flex-direction:column;gap:14px;align-items:center;z-index:3;text-shadow:0 0 6px #000}
+.s .acts button{display:flex;flex-direction:column;align-items:center;gap:2px;width:60px;font-size:12px;font-weight:500}
+.s .acts .on{color:#ff4e63}
+.s .inf{position:absolute;left:12px;right:84px;bottom:18px;z-index:3;text-shadow:0 0 6px #000}
+.s .ch{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px}
+.s .ch .av{width:44px;height:44px}
+.s .inf p{margin:10px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15px}
+.s .mu{display:inline-flex;align-items:center;gap:6px;background:rgba(60,60,60,.7);padding:6px 12px;border-radius:18px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stop{position:absolute;top:calc(8px + env(safe-area-inset-top,0));right:6px;z-index:5;display:flex;filter:drop-shadow(0 0 4px #000)}
+/* you */
+.pf{display:flex;align-items:center;gap:20px;padding:12px 16px}
+.pf .big{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#8e6bd8,#e58bbd);display:grid;place-items:center;font-size:40px;font-weight:600;flex:none}
+.pf h2{margin:0;font-size:28px;line-height:34px}
+.pf small{color:var(--mute);font-size:15px}
+.bt{display:flex;gap:10px;padding:8px 16px 20px}
+.bt .pill{flex:1;height:44px}
+.sec{display:flex;align-items:center;gap:6px;padding:12px 16px;font-size:20px;font-weight:600}
+.hs{display:flex;gap:12px;overflow-x:auto;padding:0 16px 20px;scrollbar-width:none}
+.hs::-webkit-scrollbar{display:none}
+.hs .card{flex:none;width:200px;margin:0}
+.hs .th{border-radius:12px}
+.hs .tx b{font-size:14px;line-height:19px;margin-top:8px}
+.lib .row{height:84px;padding:0 16px}
+.lib .tn{width:156px;aspect-ratio:16/9;border-radius:12px;background:var(--chip);display:grid;place-items:center;flex:none}
+.lib .row div b{display:block;font-size:18px;font-weight:500}
+.lib .row div small{color:var(--mute);font-size:14px}
+#toast{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);background:#f1f1f1;color:#111;padding:10px 16px;border-radius:8px;z-index:60;display:none;font-weight:500}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="main"></div>
+<nav id="nav">
+<button data-t="home" aria-label="Trang chủ"></button>
+<button data-t="shorts" aria-label="Shorts"></button>
+<button data-t="add" aria-label="Thêm"></button>
+<button data-t="you" aria-label="Bạn"></button>
+</nav>
+<div id="watch">
+<div class="pw"><button class="bk" id="wbk" aria-label="Thu nhỏ"></button><button class="gr" id="wgr" aria-label="Cài đặt"></button><div id="pl"></div></div>
+<div id="wb"></div>
+</div>
+<div id="srch"><form id="sf"><button type="button" class="ic" id="sbk" aria-label="Quay lại"></button><input id="sq" placeholder="Tìm kiếm" autocomplete="off"></form><div id="sr"></div></div>
+<div id="sheet"><div class="sh" id="shc"></div></div>
+<div id="toast"></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)};
+var I={home:"M12 3 3 10.5V21h6.5v-7h5v7H21V10.5z",search:"M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.5l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0a4.500 4.500 0 1 1 0-9 4.500 4.500 0 0 1 0 9z",bell:"M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.100-1.600-5.600-4.500-6.300V4a1.500 1.500 0 0 0-3 0v.7C7.600 5.400 6 7.900 6 11v5l-2 2v1h16v-1z",more:"M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",moreh:"M6 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",like:"M1 21h4V9H1zm22-11a2 2 0 0 0-2-2h-6.300l1-4.600v-.3c0-.4-.2-.8-.4-1.100L14.200 1 7.600 7.600C7.200 8 7 8.500 7 9v10a2 2 0 0 0 2 2h9c.8 0 1.500-.5 1.800-1.200l3-7c.1-.3.200-.5.200-.8z",share:"M14 9V5l7 7-7 7v-4.100c-5 0-8.500 1.600-11 5.100 1-5 4-10 11-11z",down:"M7.400 8.600 12 13.200l4.600-4.600L18 10l-6 6-6-6z",right:"M8.600 7.400 13.200 12l-4.600 4.600L10 18l6-6-6-6z",gear:"M12 15.500a3.500 3.500 0 1 1 0-7 3.500 3.500 0 0 1 0 7zm7.400-2.500c.1-.3.100-.7.100-1s0-.7-.1-1l2.100-1.600-2-3.500-2.500 1c-.5-.4-1.100-.7-1.700-1L15 3h-4l-.4 2.900c-.6.300-1.200.6-1.700 1l-2.500-1-2 3.500L6.500 11c-.1.300-.1.700-.1 1s0 .7.100 1l-2.100 1.600 2 3.500 2.500-1c.5.400 1.100.7 1.700 1L11 21h4l.4-2.900c.6-.3 1.200-.6 1.700-1l2.500 1 2-3.500z",shorts:"M10 14.500v-5l4.500 2.500zM17.800 3.700c-1.600-.9-3.500-.2-4.300 1.400l-.7 1.400c-1 .1-1.900.8-2.400 1.700l-.7 1.300 1.600.9.700-1.300c.1-.2.300-.4.600-.4 1.500-.1 3.300-.1 3.500-.1.700-.1 1.400-.4 1.900-1 1.100-1.400.9-3.500-.8-4.500zM6.200 20.300c1.600.9 3.500.2 4.300-1.400l.7-1.400c1-.1 1.900-.8 2.400-1.700l.7-1.300-1.600-.9-.7 1.300c-.1.200-.3.400-.6.400-1.500.1-3.300.1-3.500.1-.7.1-1.400.4-1.900 1-1.100 1.400-.9 3.500.2 4.900z",plus:"M11 6v5H6v2h5v5h2v-5h5v-2h-5V6z",cm:"M21 3H3v14h4v4l4-4h10z",bm:"M6 3h12v18l-6-4-6 4z",music:"M12 3v10.500A4 4 0 1 0 14 17V7h4V3z",speed:"M13 2.050v2c3.900.5 7 3.800 7 7.900 0 4.400-3.600 8-8 8s-8-3.600-8-8c0-4.100 3.100-7.400 7-7.900v-2C5.500 2.600 1 6.800 1 12c0 5.500 4.500 10 10 10s10-4.500 10-10c0-5.200-4.500-9.400-10-9.950zM10 8v8l6-4z",cc:"M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm-8 7H9.500v-.5h-2v3h2V13H11v1a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1zm7 0h-1.500v-.5h-2v3h2V13H18v1a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1z",ext:"M14 3v2h3.600l-9.800 9.800 1.400 1.400L19 6.400V10h2V3zM19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2z",key:"M12.650 10A6 6 0 1 0 12.650 14H17v4h4v-4h2v-4zM7 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4z",check:"M9 16.200 4.800 12l-1.400 1.400L9 19 21 7l-1.400-1.400z"};
+function ico(n,s){s=s||24;return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="currentColor"><path d="'+I[n]+'"/></svg>'}
+function G(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function S(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var KEY=G("yt_key","AIzaSyDWcELXjNTMD2Z8TjMMcEtrOO4dpKLaF64"),subs=G("yt_subs",{}),liked=G("yt_liked",[]),hist=G("yt_hist",[]),AV={},tab="home",sub=0;
+var API="https://www.googleapis.com/youtube/v3/";
+var COL=["#c62828","#6a1b9a","#1565c0","#00695c","#ef6c00","#4e342e","#37474f"];
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML}
+function num(n){n=+n;if(n>=1e9)return (n/1e9).toFixed(1).replace(".",",")+" Tỷ";if(n>=1e6)return (n/1e6).toFixed(1).replace(".",",")+" Tr";if(n>=1e3)return Math.round(n/1e3)+" N";return String(n)}
+function ago(d){var s=(Date.now()-new Date(d))/1000,u=[[31536000,"năm"],[2592000,"tháng"],[604800,"tuần"],[86400,"ngày"],[3600,"giờ"],[60,"phút"]];for(var i=0;i<u.length;i++)if(s>=u[i][0])return Math.floor(s/u[i][0])+" "+u[i][1]+" trước";return "vừa xong"}
+function dur(x){var m=/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(x||"");if(!m)return"";var h=+m[1]||0,mi=+m[2]||0,s=+m[3]||0;return (h?h+":"+String(mi).padStart(2,"0"):mi)+":"+String(s).padStart(2,"0")}
+function vid(s){if(/^[\w-]{11}$/.test(s))return s;var m=s.match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/);return m?m[1]:null}
+function vId(it){return typeof it.id==="string"?it.id:it.id.videoId}
+function api(p,q){q.key=KEY;return fetch(API+p+"?"+new URLSearchParams(q)).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error&&d.error.message||r.status);return d})})}
+function avs(items){
+ var ids=[];items.forEach(function(i){var c=i.snippet.channelId;if(!AV[c]&&ids.indexOf(c)<0)ids.push(c)});
+ if(!ids.length)return Promise.resolve();
+ return api("channels",{part:"snippet",id:ids.slice(0,50).join(","),maxResults:50}).then(function(d){d.items.forEach(function(c){AV[c.id]=c.snippet.thumbnails.default.url})}).catch(function(){});
+}
+function avh(cid,name,cls){return AV[cid]?'<img class="av '+(cls||"")+'" src="'+AV[cid]+'" alt="">':'<div class="av '+(cls||"")+'" style="background:'+COL[(name||" ").length%7]+'">'+esc((name||"?").charAt(0).toUpperCase())+'</div>'}
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.display="none"},2000)}
+function sheet(h){$("shc").innerHTML=h;$("sheet").classList.add("on")}
+function unsheet(){$("sheet").classList.remove("on")}
+$("sheet").onclick=function(e){if(e.target===this)unsheet()};
+
+/* nav */
+var NAVI={home:"home",shorts:"shorts",you:null};
+function nav(){
+ [].forEach.call($("nav").children,function(b){var t=b.dataset.t;b.className=t===tab?"on":"";
+  b.innerHTML=t==="add"?'<span class="pl">'+ico("plus")+'</span>':t==="you"?'<span class="pl" style="'+(tab==="you"?"":"border-color:#555")+';background:linear-gradient(135deg,#8e6bd8,#e58bbd);font-weight:600;font-size:13px">B</span>':ico(t,28)});
+}
+$("nav").onclick=function(e){var b=e.target.closest("button");if(!b)return;var t=b.dataset.t;if(t==="add")return toast("Tính năng tạo video chưa có");go(t)};
+function go(t){tab=t;nav();$("main").style.overflowY=t==="shorts"?"hidden":"auto";$("main").scrollTop=0;({home:home,shorts:shorts,you:you})[t]()}
+function hdr(){return '<div class="hd"><div class="logo"><i></i><span>MyTube</span></div><div class="rt"><button class="ic" aria-label="Thông báo">'+ico("bell")+'</button><button class="ic" id="hs" aria-label="Tìm kiếm">'+ico("search")+'</button></div></div>'}
+function keyForm(){
+ tab="you";nav();
+ $("main").innerHTML='<form class="kb" id="kf"><h2 style="margin:0">Nhập YouTube Data API key</h2><input id="k" type="password" placeholder="API key" autocomplete="off" value="'+esc(KEY)+'"><button class="pill big" type="submit">Lưu</button><small style="color:var(--mute)">Key chỉ lưu trong trình duyệt của bạn.</small></form>';
+ $("kf").onsubmit=function(e){e.preventDefault();KEY=$("k").value.trim();S("yt_key",KEY);go("home")};
+}
+function errv(el,m){el.innerHTML='<div id="msg"><b>Có lỗi:</b> '+esc(m)+'</div>'}
+
+/* cards */
+function card(it){
+ var id=vId(it),s=it.snippet,th=(s.thumbnails.high||s.thumbnails.medium).url,st=it.statistics?'▷ '+num(it.statistics.viewCount)+'  ':'';
+ var d=it.contentDetails?dur(it.contentDetails.duration):"";
+ var b=document.createElement("button");b.className="card";
+ b.innerHTML='<div class="tw"><img class="th" src="'+th+'" alt="">'+(d&&d!=="0:00"?'<span class="dur">'+d+'</span>':'')+'</div><div class="mt">'+avh(s.channelId,s.channelTitle)+'<div class="tx"><b>'+esc(s.title)+'</b><small>'+esc(s.channelTitle)+'  '+st+ago(s.publishedAt)+'</small></div><span class="mo">'+ico("more")+'</span></div>';
+ b.onclick=function(){openWatch(id)};return b;
+}
+function cards(el,items){el.innerHTML="";if(!items.length)return errv(el,"Không có video nào.");items.forEach(function(it){el.appendChild(card(it))})}
+
+/* home */
+var TABS=[["Trang chủ",{}],["Âm nhạc",{c:10}],["Trực tiếp",{live:1}],["Trò chơi",{c:20}],["Tin tức",{c:25}],["Thể thao",{c:17}]];
+function home(){
+ if(!KEY)return keyForm();
+ $("main").innerHTML=hdr()+'<div class="tabs" id="tb">'+TABS.map(function(t,i){return '<button class="'+(i===sub?"on":"")+'" data-i="'+i+'">'+t[0]+'</button>'}).join("")+'</div><div id="feed"></div>';
+ $("hs").onclick=openSearch;
+ $("tb").onclick=function(e){var b=e.target.closest("button");if(!b)return;sub=+b.dataset.i;home()};
+ var f=$("feed"),t=TABS[sub][1];f.innerHTML='<div class="sk"></div><div class="sk"></div>';
+ var req=t.live?api("search",{part:"snippet",type:"video",eventType:"live",maxResults:20,regionCode:"VN"}):api("videos",Object.assign({part:"snippet,statistics,contentDetails",chart:"mostPopular",maxResults:24,regionCode:"VN"},t.c?{videoCategoryId:t.c}:{}));
+ req.then(function(d){return avs(d.items).then(function(){cards(f,d.items)})}).catch(function(e){errv(f,e.message)});
+}
+
+/* search */
+function openSearch(){$("srch").classList.add("on");$("sq").focus()}
+$("sbk").innerHTML=ico("down");$("sbk").firstChild.style.transform="rotate(90deg)";
+$("sbk").onclick=function(){$("srch").classList.remove("on")};
+$("sf").onsubmit=function(e){
+ e.preventDefault();var s=$("sq").value.trim();if(!s)return;
+ var id=vid(s);if(id){$("srch").classList.remove("on");return openWatch(id)}
+ if(!KEY)return;var r=$("sr");r.innerHTML='<div class="sk"></div>';$("sq").blur();
+ api("search",{part:"snippet",type:"video",maxResults:20,q:s}).then(function(d){return avs(d.items).then(function(){cards(r,d.items)})}).catch(function(e){errv(r,e.message)});
+};
+
+/* shorts */
+function shorts(){
+ if(!KEY)return keyForm();
+ $("main").innerHTML='<div id="shs"></div><div class="stop"><button class="ic" id="ss">'+ico("search")+'</button><button class="ic">'+ico("moreh")+'</button></div>';
+ $("ss").onclick=openSearch;
+ var c=$("shs");c.innerHTML='<div id="msg">Đang tải...</div>';
+ api("search",{part:"snippet",type:"video",videoDuration:"short",q:"#shorts",maxResults:15,regionCode:"VN"}).then(function(d){
+  var ids=d.items.map(vId).join(",");
+  return Promise.all([api("videos",{part:"snippet,statistics",id:ids}),avs(d.items)]);
+ }).then(function(r){
+  var items=r[0].items;c.innerHTML="";
+  var ob=new IntersectionObserver(function(es){es.forEach(function(e){var fr=e.target.querySelector(".fr");
+   if(e.isIntersecting&&e.intersectionRatio>=.7){var id=e.target.dataset.id;fr.innerHTML='<iframe src="https://www.youtube.com/embed/'+id+'?autoplay=1&controls=0&loop=1&playlist='+id+'&playsinline=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media" title="Short"></iframe>'}else fr.innerHTML=""})},{root:c,threshold:[0,.7]});
+  items.forEach(function(it){
+   var s=it.snippet,st=it.statistics||{},sec=document.createElement("section");sec.className="s";sec.dataset.id=it.id;
+   sec.innerHTML='<img class="bg" src="'+(s.thumbnails.high||s.thumbnails.medium).url+'" alt=""><div class="fr"></div><div class="acts"><button data-a="l" class="'+(liked.indexOf(it.id)>=0?"on":"")+'">'+ico("like",30)+'<span>'+num(st.likeCount||0)+'</span></button><button data-a="c">'+ico("cm",30)+'<span>'+num(st.commentCount||0)+'</span></button><button data-a="s">'+ico("bm",30)+'<span>Lưu</span></button><button data-a="sh">'+ico("share",30)+'<span>Chia sẻ</span></button></div><div class="inf"><div class="ch">'+avh(s.channelId,s.channelTitle)+'<span>@'+esc(s.channelTitle)+'</span><button class="pill">Đăng ký</button></div><p>'+esc(s.title)+'</p><span class="mu">'+ico("music",16)+' Âm thanh gốc · '+esc(s.channelTitle)+'</span></div>';
+   sec.querySelector(".acts").onclick=function(e){var b=e.target.closest("button");if(!b)return;var a=b.dataset.a;
+    if(a==="l")toggleLike(it.id,b);else if(a==="c")comments(it.id);else if(a==="sh")share(it.id,s.title);else toast("Đã lưu")};
+   c.appendChild(sec);ob.observe(sec);
+  });
+ }).catch(function(e){errv(c,e.message)});
+}
+function toggleLike(id,b){var i=liked.indexOf(id);if(i>=0)liked.splice(i,1);else liked.unshift(id);S("yt_liked",liked);if(b)b.classList.toggle("on",i<0)}
+function share(id,t){var u="https://youtu.be/"+id;if(navigator.share){navigator.share({title:t,url:u}).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){toast("Đã sao chép link")},function(){toast(u)})}else toast(u)}
+function comments(id){
+ sheet('<h4>Bình luận</h4><div id="cl"><div id="msg">Đang tải...</div></div>');
+ api("commentThreads",{part:"snippet",videoId:id,maxResults:30,order:"relevance"}).then(function(d){
+  $("cl").innerHTML=d.items.length?d.items.map(function(c){var s=c.snippet.topLevelComment.snippet;return '<div class="cm"><img class="av" src="'+esc(s.authorProfileImageUrl)+'" alt=""><div><small>@'+esc(s.authorDisplayName)+' · '+ago(s.publishedAt)+'</small><p>'+s.textDisplay+'</p></div></div>'}).join(""):'<div id="msg">Chưa có bình luận.</div>';
+ }).catch(function(e){$("cl").innerHTML='<div id="msg">Không tải được bình luận (có thể đã bị tắt).</div>'});
+}
+
+/* you */
+function you(){
+ $("main").innerHTML='<div class="hd"><button class="pill ol" style="height:44px;padding:0 20px;gap:6px">Tài khoản '+ico("down",18)+'</button><div class="rt"><button class="ic">'+ico("bell")+'</button><button class="ic" id="ys">'+ico("search")+'</button><button class="ic" id="yk">'+ico("gear")+'</button></div></div><div class="pf"><div class="big">B</div><div><h2>Người xem</h2><small>@nguoixem</small></div></div><div class="bt"><a class="pill" style="text-decoration:none" href="https://www.youtube.com" target="_blank" rel="noopener">Xem kênh</a><button class="pill ol" id="yk2">Đổi API key</button></div><div class="sec" id="hh">Video đã xem '+ico("right")+'</div><div class="hs" id="hl"></div><div class="sec">Thư viện</div><div class="lib"><button class="row" id="lk"><span class="tn">'+ico("like",36)+'</span><div><b>Video đã thích</b><small>Riêng tư · '+liked.length+' video</small></div></button></div>';
+ $("ys").onclick=openSearch;$("yk").onclick=$("yk2").onclick=keyForm;
+ $("lk").onclick=function(){list("Video đã thích",liked)};$("hh").onclick=function(){list("Video đã xem",hist)};
+ var h=$("hl");
+ if(!hist.length||!KEY){h.innerHTML='<div style="color:var(--mute);padding:8px 0">Bạn chưa xem video nào.</div>';return}
+ api("videos",{part:"snippet",id:hist.slice(0,10).join(",")}).then(function(d){
+  var o={};d.items.forEach(function(v){o[v.id]=v});h.innerHTML="";
+  hist.slice(0,10).forEach(function(id){var v=o[id];if(!v)return;var b=document.createElement("button");b.className="card";
+   b.innerHTML='<img class="th" src="'+(v.snippet.thumbnails.high||v.snippet.thumbnails.medium).url+'" alt=""><div class="tx"><b>'+esc(v.snippet.title)+'</b><small>'+esc(v.snippet.channelTitle)+'</small></div>';
+   b.onclick=function(){openWatch(id)};h.appendChild(b)});
+ }).catch(function(){});
+}
+function list(t,ids){
+ $("main").innerHTML='<div class="hd"><button class="ic" id="lb">'+ico("down")+'</button><b style="font-size:18px;flex:1;margin-left:8px">'+t+'</b></div><div id="feed"></div>';
+ $("lb").firstChild.style.transform="rotate(90deg)";$("lb").onclick=you;
+ var f=$("feed");if(!ids.length||!KEY)return errv(f,"Chưa có video nào.");
+ api("videos",{part:"snippet,statistics,contentDetails",id:ids.slice(0,50).join(",")}).then(function(d){var o={};d.items.forEach(function(v){o[v.id]=v});var items=ids.map(function(i){return o[i]}).filter(Boolean);return avs(items).then(function(){cards(f,items)})}).catch(function(e){errv(f,e.message)});
+}
+
+/* watch */
+var P=null,PR=false,curId=null,speed=1,ccOn=false,curT="";
+window.onYouTubeIframeAPIReady=function(){PR=true;if(curId&&!P)mkP(curId)};
+function mkP(id){P=new YT.Player("pl",{videoId:id,playerVars:{autoplay:1,playsinline:1,rel:0,modestbranding:1},events:{onReady:function(e){e.target.setPlaybackRate(speed)}}})}
+$("wbk").innerHTML=ico("down",26);$("wgr").innerHTML=ico("gear",22);
+$("wbk").onclick=function(){if(P&&P.pauseVideo)P.pauseVideo();$("watch").classList.remove("on")};
+$("wgr").onclick=settings;
+function openWatch(id){
+ curId=id;curT="";$("srch").classList.remove("on");$("watch").classList.add("on");
+ hist=hist.filter(function(x){return x!==id});hist.unshift(id);hist=hist.slice(0,30);S("yt_hist",hist);
+ if(P&&P.loadVideoById){P.loadVideoById(id);P.setPlaybackRate(speed)}else if(PR)mkP(id);
+ var wb=$("wb");wb.scrollTop=0;wb.innerHTML='<div class="wt"><h1>Đang tải...</h1></div>';
+ if(!KEY)return;
+ api("videos",{part:"snippet,statistics",id:id}).then(function(d){
+  var v=d.items[0];if(!v)throw new Error("Không tìm thấy video.");
+  var s=v.snippet,st=v.statistics,cid=s.channelId;curT=s.title;
+  return avs([v]).then(function(){
+   wb.innerHTML='<div class="wt"><h1 id="wh">'+esc(s.title)+'</h1><div class="wm" id="wm"><b>@'+esc(s.channelTitle)+'</b><span>'+num(st.likeCount||0)+' lượt thích</span><span>'+num(st.viewCount||0)+' lượt xem</span><span>'+ago(s.publishedAt)+'</span><b>thêm</b></div></div>'
+   +'<div class="cr">'+avh(cid,s.channelTitle)+'<button class="pill" id="sb"></button><button class="pill dk" aria-label="Thông báo">'+ico("bell",20)+ico("down",18)+'</button><span class="sp"></span><button class="ic act" id="lk2" aria-label="Thích">'+ico("like")+'</button><button class="ic dis" aria-label="Không thích">'+ico("like")+'</button><button class="ic" id="sh2" aria-label="Chia sẻ">'+ico("share")+'</button><button class="ic" id="mo2" aria-label="Thêm">'+ico("moreh")+'</button></div>'
+   +'<button class="cmt" id="cb"><h3>Bình luận<span id="cn">'+(st.commentCount?num(st.commentCount):"")+'</span></h3><div class="r">'+'<div class="av" style="background:linear-gradient(135deg,#8e6bd8,#e58bbd)">B</div><div class="p" id="cp">Xem bình luận...</div></div></button><div id="rl"></div>';
+   var sb=$("sb");function ps(){sb.textContent=subs[cid]?"Đã đăng ký":"Đăng ký";sb.className="pill"+(subs[cid]?" dk":"")}ps();
+   sb.onclick=function(){subs[cid]=!subs[cid];S("yt_subs",subs);ps()};
+   var lb=$("lk2");lb.className="ic act"+(liked.indexOf(id)>=0?" on":"");lb.onclick=function(){toggleLike(id,lb)};
+   $("sh2").onclick=function(){share(id,s.title)};$("mo2").onclick=function(){sheet('<button class="row" id="ox">'+ico("ext")+'Mở trên YouTube</button>');$("ox").onclick=function(){window.open("https://www.youtube.com/watch?v="+id,"_blank","noopener");unsheet()}};
+   function ex(){$("wh").classList.add("x");$("wm").insertAdjacentHTML("afterend",'<div class="wd" style="padding:0 0 8px">'+esc(s.description)+'</div>');$("wm").onclick=null;$("wh").onclick=null}
+   $("wm").onclick=ex;$("wh").onclick=ex;
+   $("cb").onclick=function(){comments(id)};
+   api("commentThreads",{part:"snippet",videoId:id,maxResults:1}).then(function(c){if(c.items[0])$("cp").textContent=c.items[0].snippet.topLevelComment.snippet.textOriginal}).catch(function(){$("cp").textContent="Bình luận đã bị tắt"});
+   return api("search",{part:"snippet",type:"video",maxResults:15,q:s.title.slice(0,60)});
+  });
+ }).then(function(d){
+  if(!d||curId!==id)return;
+  var items=d.items.filter(function(i){return i.id.videoId!==id});
+  return avs(items).then(function(){var r=$("rl");if(r)cards(r,items)});
+ }).catch(function(e){if(curId===id)errv(wb,e.message)});
+}
+function settings(){
+ sheet('<button class="row" id="o1">'+ico("speed",28)+'Tốc độ phát<span class="v">'+(speed===1?"Bình thường":speed+"x")+ico("right",20)+'</span></button><button class="row" id="o2">'+ico("cc",28)+'Phụ đề<span class="v">'+(ccOn?"Tiếng Việt":"Tắt")+ico("right",20)+'</span></button><button class="row" id="o3">'+ico("share",28)+'Chia sẻ</button><button class="row" id="o4">'+ico("ext",28)+'Mở trên YouTube</button>');
+ $("o1").onclick=speedSheet;$("o2").onclick=ccSheet;$("o3").onclick=function(){unsheet();share(curId,curT)};
+ $("o4").onclick=function(){window.open("https://www.youtube.com/watch?v="+curId,"_blank","noopener");unsheet()};
+}
+function speedSheet(){
+ var v=[0.25,0.5,0.75,1,1.25,1.5,1.75,2];
+ sheet('<h4>Tốc độ phát</h4>'+v.map(function(x){return '<button class="row" data-s="'+x+'"><span class="ck">'+(x===speed?ico("check"):"")+'</span>'+(x===1?"Bình thường":x+"x")+'</button>'}).join(""));
+ $("shc").onclick=function(e){var b=e.target.closest("[data-s]");if(!b)return;speed=+b.dataset.s;if(P&&P.setPlaybackRate)P.setPlaybackRate(speed);unsheet()};
+}
+function ccSheet(){
+ sheet('<h4>Phụ đề</h4><button class="row" data-c="0"><span class="ck">'+(!ccOn?ico("check"):"")+'</span>Tắt phụ đề</button><button class="row" data-c="1"><span class="ck">'+(ccOn?ico("check"):"")+'</span>Tiếng Việt (được tạo tự động)</button>');
+ $("shc").onclick=function(e){var b=e.target.closest("[data-c]");if(!b)return;ccOn=b.dataset.c==="1";
+  try{if(ccOn){P.loadModule("captions");P.setOption("captions","track",{languageCode:"vi"})}else P.unloadModule("captions")}catch(x){}
+  unsheet()};
+}
+nav();go("home");
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
