@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f0f0f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MyTube">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>MyTube</title>
 <style>
 :root{--bg:#0f0f0f;--ink:#f1f1f1;--mute:#aaa;--chip:#272727;--card:#1f1f1f;--line:#303030;--red:#f00;--blue:#3ea6ff}
@@ -13,9 +20,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 input{font:inherit}
 svg{display:block}
 #app{position:relative;width:100%;max-width:480px;height:100dvh;margin:0 auto;background:var(--bg);overflow:hidden}
-#main{position:absolute;inset:0 0 64px 0;overflow-y:auto;scrollbar-width:none}
+#main{position:absolute;inset:0 0 calc(64px + env(safe-area-inset-bottom,0px)) 0;overflow-y:auto;scrollbar-width:none}
 #main::-webkit-scrollbar{display:none}
-#nav{position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;justify-content:space-around;align-items:center;background:var(--bg);border-top:1px solid #1a1a1a;z-index:10;padding-bottom:env(safe-area-inset-bottom,0)}
+#nav{position:absolute;left:0;right:0;bottom:0;height:calc(64px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-around;align-items:center;background:var(--bg);border-top:1px solid #1a1a1a;z-index:10;padding-bottom:env(safe-area-inset-bottom,0px)}
 #nav button{width:64px;height:48px;display:grid;place-items:center;opacity:.9}
 #nav button.on{opacity:1}
 #nav .pl{width:36px;height:36px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center}
@@ -366,6 +373,7 @@ function ccSheet(){
   unsheet()};
 }
 nav();go("home");
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 </script>
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
